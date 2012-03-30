@@ -20,19 +20,28 @@ def get_tasks():
   for task in task_service['items']:
     if task['title']:
       tasks.append({
+        'id': task['id'],
         'title': task['title'],
         'due': datetime.strptime(task['due'], '%Y-%m-%dT%H:%M:%S.000Z'),
         'complete': task['status'] == 'completed'})
   return tasks
 
 class SplashHandler(webapp.RequestHandler):
-  @decorator.oauth_aware
   def get(self):
-    if not decorator.has_credentials():
-      self.response.out.write(template.render('templates/convert.html',
-        {'authorize_url': decorator.authorize_url()}))
-    else:
-      self.redirect('/tasks/')
+    self.response.out.write(template.render('templates/convert.html',
+      {'authorize_url': '/tasks/'}))
+
+class CompletedHandler(webapp.RequestHandler):
+  @decorator.oauth_required
+  def get(self):
+    service = build('tasks', 'v1', http=decorator.http())
+
+    task = service.tasks().get(tasklist='@default',
+        task=self.request.get('task')).execute()
+    task['status'] = 'completed'
+
+    result = service.tasks().update(tasklist='@default', task=task['id'], body=task).execute()
+    self.response.out.write('success')
 
 class TasksHandler(webapp.RequestHandler):
   @decorator.oauth_required
@@ -56,7 +65,10 @@ class TasksHandler(webapp.RequestHandler):
                                               {'tasks': tasks}))
 
 application = webapp.WSGIApplication(
-    [('/', SplashHandler), ('/tasks/', TasksHandler)], debug=True)
+    [('/', SplashHandler),
+      ('/tasks/', TasksHandler),
+      ('/complete/', CompletedHandler)],
+    debug=True)
 
 def main():
   run_wsgi_app(application)

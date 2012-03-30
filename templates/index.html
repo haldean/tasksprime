@@ -22,7 +22,7 @@
         <a class="title" title="Grant read access to your tasks" href="{{ authorize_url }}">Grant Access</a>
       {% endif %}
 
-      <li class="add"><span class="check">&nbsp;</span>
+      <li class="add">
           new:
           <form id="addform" method="GET" action="." style="display:inline;">
             <input type="text" id="addtask" name="title">
@@ -32,15 +32,7 @@
       </li>
       {% for task in tasks %}
       <li class="{% if task.complete %}complete{% else %}incomplete{% endif %}">
-        <span class="check">
-          <span>
-            {% if task.complete %}
-            &#x2713;
-            {% else %}
-            &nbsp;
-            {% endif %}
-          </span>
-        </span>
+        <span class="check" id="{{ task.id }}">&#x2713;</span>
         <a class="title" title="{{ task.title }}">{{ task.title }}</a>
       </li>
       {% endfor %}
