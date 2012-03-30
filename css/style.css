@@ -1,0 +1,122 @@
+@import url(http://fonts.googleapis.com/css?family=Gudea:400,700);
+
+body {
+  width: 800px;
+  margin: auto;
+  margin-top: 48px;
+  margin-bottom: 48px;
+  font-family: 'Gudea', sans-serif;
+  font-size: 24px;
+}
+
+a {
+  color: #000;
+}
+
+.tasks-title {
+  font-weight: bold;
+  font-size: 14pt;
+}
+
+#header {
+  position: fixed;
+  left: 0px;
+  bottom: 0px;
+  width: 100%;
+  padding: 10px;
+  background: #000000;
+
+  color: #EEE;
+  font-size: 12pt;
+  text-transform: lowercase;
+}
+
+.complete {
+  display: none;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  padding-left: 20px;
+  padding-bottom: 20px;
+}
+
+li .check {
+  display: block;
+  float: left;
+  padding-right: 20px;
+  width: 20px;
+}
+
+li .title {
+  margin-left: 4px;
+  padding-left: 20px;
+}
+
+.add {
+  color: #BBB;
+  font-size: 12pt;
+  position: relative;
+  left: -15px;
+  padding-left: 0;
+}
+
+#adddate {
+  margin-left: 23px;
+  font-size: 22px;
+  border: none;
+  border-bottom: #CCC solid 1px;
+  width: 200px;
+}
+
+#addtask {
+  margin-left: 23px;
+  font-size: 22px;
+  border: none;
+  border-bottom: #CCC solid 1px;
+  width: 40%;
+}
+
+#addsubmit {
+  margin-left: 23px;
+  display: inline;
+  background: #FFF;
+  border: 1px solid #CCC;
+  color: #999;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+#addsubmit:hover {
+  background-color: #000;
+  color: #FFF;
+  border-color: #000;
+}
+
+#loading {
+  display: none;
+  position: absolute;
+  right: 34px;
+  bottom: 12px;
+  height: 18px;
+  width: 18px;
+}
+
+#startnow {
+  display: block;
+  background: #000;
+  color: #FFF;
+  padding: 3px 10px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.fineprint {
+  margin-top: 24px;
+  font-size: 12px;
+}

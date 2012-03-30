@@ -1,0 +1,58 @@
+.date {
+  width: 200px;
+  font-size: 12px;
+  display: none;
+  position: absolute;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 999999999;
+}
+.date.active {
+  display: block;
+}
+.date table {
+  width: 100%;
+  background-color: #FFF;
+  border-radius: 5px;
+  border-collapse: collapse;
+  cursor: default;
+}
+.date table tr.date-header th {
+  text-align: center;
+  background-color: #000;
+  color: #FFF;
+}
+.date table th.date-month-year {
+}
+.date table tr.date-daysofweek th {
+  color: #FFF;
+  background-color: #000;
+}
+.date table tbody tr:hover,
+.date table tbody td.hover {
+  background-color: #F2F2F2;
+}
+.date table td,
+.date table th {
+  color: #888;
+  font-weight: bold;
+  text-align: right;
+  border: 0;
+  padding: 5px;
+}
+.date table tbody td,
+.date tr.date-daysofweek th {
+}
+.date table tbody td:last-child,
+.date table tr.date-daysofweek th:last-child {
+  border-right-width: 0;
+}
+.date table td.today {
+  color: #000;
+}
+.date table .inactive {
+  color: #BBB;
+}
+.date-month-previous {
+  -webkit-transform: rotate(180deg);
+}
