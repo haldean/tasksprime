@@ -7,7 +7,8 @@ import settings
 from datetime import datetime
 from google.appengine.ext.webapp import template
 
-decorator = OAuth2Decorator(client_id=settings.CLIENT_ID,
+decorator = OAuth2Decorator(
+    client_id=settings.CLIENT_ID,
     client_secret=settings.CLIENT_SECRET,
     scope=settings.SCOPE,
     user_agent='mytasks')
@@ -24,24 +25,18 @@ def get_tasks():
         'complete': task['status'] == 'completed'})
   return tasks
 
-def sample_tasks():
-  tasks = []
-  for i in range(20):
-    tasks.append({
-      'title': 'task number %d' % i,
-      'due': datetime.now(),
-      'complete': i % 2 == 0
-      })
-  return tasks
-
-class MainHandler(webapp.RequestHandler):
+class SplashHandler(webapp.RequestHandler):
   @decorator.oauth_aware
   def get(self):
-    if decorator.has_credentials():
+    if not decorator.has_credentials():
       self.response.out.write(template.render('templates/convert.html',
         {'authorize_url': decorator.authorize_url()}))
-      return
+    else:
+      self.redirect('/tasks/')
 
+class TasksHandler(webapp.RequestHandler):
+  @decorator.oauth_required
+  def get(self):
     if self.request.get('title'):
       date = datetime.strptime(self.request.get('date'), '%m/%d/%Y')
       task = {
@@ -53,14 +48,15 @@ class MainHandler(webapp.RequestHandler):
       service = build('tasks', 'v1', http=decorator.http())
       result = service.tasks().insert(tasklist='@default', body=task).execute()
       self.response.out.write('success')
-      return
+    else:
+      tasks = get_tasks()
+      #tasks = sample_tasks()
+      tasks.sort(key=lambda x: x['due'])
+      self.response.out.write(template.render('templates/index.html',
+                                              {'tasks': tasks}))
 
-    tasks = get_tasks()
-    #tasks = sample_tasks()
-    tasks.sort(key=lambda x: x['due'])
-    self.response.out.write(template.render('templates/index.html',
-                                            {'tasks': tasks}))
+application = webapp.WSGIApplication(
+    [('/', SplashHandler), ('/tasks/', TasksHandler)], debug=True)
 
-application = webapp.WSGIApplication([('/', MainHandler)], debug=True)
 def main():
   run_wsgi_app(application)

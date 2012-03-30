@@ -1,6 +1,4 @@
-;
-
-$.domReady(function () {
+;$.domReady(function () {
   $('#complete').click(function(e) {
     if ($('#complete').attr('checked')) {
       $('.complete').css('display', 'list-item')
@@ -22,7 +20,6 @@ $.domReady(function () {
     e.stopPropagation()
 
     var title = $('#addtask').val()
-    console.log(title)
     if (!title) {
       $('#addtask').focus()
       return
@@ -38,7 +35,7 @@ $.domReady(function () {
     var check_span = '<span class="check">&nbsp;</span>'
     var item = '<a class="title">' + title + '</a>'
     $.ajax({
-      url: '/',
+      url: '/tasks/',
       type: 'html',
       method: 'get',
       data: { 'title': title, 'date': $('#adddate').val() },
