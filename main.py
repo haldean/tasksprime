@@ -1,11 +1,11 @@
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import run_wsgi_app
 from apiclient.discovery import build
-import httplib2
-from oauth2client.appengine import OAuth2Decorator
-import settings
 from datetime import datetime
+from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
+from google.appengine.ext.webapp.util import run_wsgi_app
+from oauth2decorator import OAuth2Decorator
+import httplib2
+import settings
 
 decorator = OAuth2Decorator(
     client_id=settings.CLIENT_ID,
@@ -27,9 +27,13 @@ def get_tasks():
   return tasks
 
 class SplashHandler(webapp.RequestHandler):
+  @decorator.oauth_check
   def get(self):
-    self.response.out.write(template.render('templates/convert.html',
-      {'authorize_url': '/tasks/'}))
+    if decorator.has_credentials():
+      self.redirect('/tasks/')
+    else:
+      self.response.out.write(template.render('templates/convert.html',
+        {'authorize_url': '/tasks/'}))
 
 class CompletedHandler(webapp.RequestHandler):
   @decorator.oauth_required
