@@ -25,6 +25,7 @@ class OAuth2Decorator(oa2d):
       # Don't use @login_decorator as this could be used in a POST request.
       if not user:
         self.credentials = None
+        method(request_handler, *args, **kwargs)
         return
 
 
