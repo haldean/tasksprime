@@ -16,12 +16,10 @@
 
     var blink_on = function() {
       loader.css('color', '#FFF')
-      console.log(loader.css('color'))
     }
 
     var blink_off = function() {
       loader.css('color', '#666')
-      console.log(loader.css('color'))
     }
 
     if (!loading) {
@@ -60,6 +58,7 @@
       method: 'get',
       success: function(resp) {
         $('#tasklist .task').remove()
+        $('#tutorial').css('display', 'none')
 
         var task_count = resp.length
         var incomplete_count = 0
@@ -69,9 +68,15 @@
           }
           $('#tasklist').append(makeTaskLi(resp[i]))
         }
-        $('#tasks-todo').html(incomplete_count + ' things to do, ' +
-          task_count + ' things done.')
-        bindEvents()
+
+        if (task_count > 0) {
+          $('#tasks-todo').html(incomplete_count + ' things to do, ' +
+            (task_count - incomplete_count) + ' things done.')
+          bindEvents()
+        } else {
+          $('#tasks-todo').html('no tasks yet. add one above to get started!')
+          $('#tutorial').css('display', 'block')
+        }
 
         if (callback) callback()
       }

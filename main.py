@@ -18,6 +18,10 @@ def get_tasks():
   tasks = []
   service = build('tasks', 'v1', http=decorator.http())
   task_service = service.tasks().list(tasklist='@default').execute()
+
+  if 'items' not in task_service:
+    return []
+
   for task in task_service['items']:
     if task['title']:
       if 'due' in task:
