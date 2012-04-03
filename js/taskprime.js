@@ -1,27 +1,40 @@
 ;(function() {
-  var loading = true
+  var loading = false
   var task_field_init = false
   var date_field_init = false
+  var blink_high = false
 
   var startLoad = function() {
-    loading = true
-    loadTick()
+    if (!loading) {
+      loading = true
+      loadTick()
+    }
   }
 
   var loadTick = function() {
-    var loader = $('#loader')
+    var loader = $('.tasks-title')
+
+    var blink_on = function() {
+      loader.css('color', '#FFF')
+      console.log(loader.css('color'))
+    }
+
+    var blink_off = function() {
+      loader.css('color', '#666')
+      console.log(loader.css('color'))
+    }
+
     if (!loading) {
-      loader.css('display', 'none')
+      blink_on()
       return
-    }
-
-    if (loader.css('display') == 'none') {
-      loader.css('display', 'block')
+    } else if (blink_high) {
+      blink_off()
     } else {
-      loader.css('display', 'none')
+      blink_on()
     }
 
-    setTimeout(loadTick, 500)
+    blink_high = !blink_high
+    setTimeout(loadTick, 300)
   }
 
   var endLoad = function() {
@@ -94,6 +107,8 @@
   $.domReady(function () {
     startLoad()
     getTasks(endLoad)
+
+    $('#adddate').calender()
 
     $('#complete').click(function(e) {
       if ($('#complete').attr('checked')) {

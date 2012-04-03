@@ -3,18 +3,19 @@
   <head>
     <title>tasks'</title>
     <link href="/css/style.css" rel="stylesheet" type="text/css">
-    <link href="/css/kalendae.css" rel="stylesheet" type="text/css">
+    <link href="/css/calender.css" rel="stylesheet" type="text/css">
     <script src="/js/ender.js"></script>
-    <script src="/js/kalendae.min.js"></script>
     <script src="/js/taskprime.js"></script>
   </head>
   <body>
     <div id="header">
-      <span class="tasks-title">Tasks'</span> &nbsp;&nbsp; 
+      <span class="tasks-title">tasks'</span> &nbsp;&nbsp; 
       <span id="tasks-todo"></span>
-      <span id="username">&nbsp;&nbsp;{{ user }}</span>
+      <!--<span id="username">&nbsp;&nbsp;{{ user }}</span>-->
+      <a id="donate" target="blank"
+          href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=will%2eh%2ebrown%40gmail%2ecom&lc=US&item_name=Will%20Brown&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted">
+          buy Will a coffee</a></span>
     </div>
-    <div id="loader">&nbsp;</div>
     <ul id="tasklist">
       <li class="add">
         <form id="addform" method="GET" action="." style="display:inline;">
