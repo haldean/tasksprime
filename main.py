@@ -19,11 +19,25 @@ def get_tasks():
   task_service = service.tasks().list(tasklist='@default').execute()
   for task in task_service['items']:
     if task['title']:
+      if 'due' in task:
+        due = datetime.strptime(task['due'], '%Y-%m-%dT%H:%M:%S.000Z')
+      else:
+        due = None
+
       tasks.append({
         'id': task['id'],
         'title': task['title'],
-        'due': datetime.strptime(task['due'], '%Y-%m-%dT%H:%M:%S.000Z'),
+        'due': due,
         'complete': task['status'] == 'completed'})
+
+  def compare_dates(d1, d2):
+    try:
+      return cmp(d1, d2)
+    except:
+      if not d1 and d2: return -1
+      if d1 and not d2: return 1
+      return 0
+  tasks.sort(cmp=compare_dates, key=lambda x: x['due'])
   return tasks
 
 class SplashHandler(webapp.RequestHandler):
@@ -47,32 +61,51 @@ class CompletedHandler(webapp.RequestHandler):
     result = service.tasks().update(tasklist='@default', task=task['id'], body=task).execute()
     self.response.out.write('success')
 
+class ApiHandler(webapp.RequestHandler):
+  @decorator.oauth_check
+  def get(self):
+    if not decorator.has_credentials():
+      return
+
+    self.response.headers['Content-Type'] = 'application/json'
+
+    import json
+    def strip_dates(d):
+      del d['due']
+      return d
+    tasks = map(strip_dates, get_tasks())
+    self.response.out.write(json.dumps(tasks))
+
 class TasksHandler(webapp.RequestHandler):
   @decorator.oauth_required
   def get(self):
     if self.request.get('title'):
-      date = datetime.strptime(self.request.get('date'), '%m/%d/%Y')
-      task = {
-          'title': self.request.get("title"),
-          'notes': '',
-          'due': date.strftime('%Y-%m-%dT%H:%M:%S.000Z')
-          }
+      if self.request.get('date'):
+        date = datetime.strptime(self.request.get('date'), '%m/%d/%Y')
+        task = {
+            'title': self.request.get('title'),
+            'notes': '',
+            'due': date.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+            }
+      else:
+        task = { 'title': self.request.get('title') }
 
       service = build('tasks', 'v1', http=decorator.http())
       result = service.tasks().insert(tasklist='@default', body=task).execute()
       self.response.out.write('success')
     else:
-      tasks = get_tasks()
-      #tasks = sample_tasks()
-      tasks.sort(key=lambda x: x['due'])
-      self.response.out.write(template.render('templates/index.html',
-                                              {'tasks': tasks}))
+      with open('templates/index.html') as f:
+        self.response.out.write(f.read())
 
 application = webapp.WSGIApplication(
     [('/', SplashHandler),
+      ('/tasks/json', ApiHandler),
       ('/tasks/', TasksHandler),
       ('/complete/', CompletedHandler)],
     debug=True)
 
 def main():
   run_wsgi_app(application)
+
+if __name__ == '__main__':
+  main()

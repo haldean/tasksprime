@@ -48,17 +48,19 @@ ul {
 li {
   padding-left: 20px;
   padding-bottom: 20px;
+  cursor: default;
 }
 
 li .check {
   display: block;
   float: left;
-  padding-right: 20px;
+  margin-right: 20px;
   width: 20px;
-  color: #EEE;
+  height: 20px;
+  color: #DDD;
 }
 
-li .check:hover {
+li.incomplete:hover .check {
   color: #999;
   cursor: default;
 }
@@ -82,39 +84,22 @@ li .title {
   border: none;
   border-bottom: #CCC solid 1px;
   width: 200px;
+  color: #CCC;
 }
 
 #addtask {
-  margin-left: 35px;
+  margin-left: 43px;
   font-size: 22px;
   border: none;
   border-bottom: #CCC solid 1px;
   width: 40%;
+  color: #CCC;
 }
 
 #addsubmit {
   margin-left: 23px;
   display: inline;
-  background: #FFF;
-  border: 1px solid #CCC;
-  color: #999;
-  font-family: inherit;
-  font-size: 14px;
-}
-
-#addsubmit:hover {
-  background-color: #000;
-  color: #FFF;
-  border-color: #000;
-}
-
-#loading {
-  display: none;
-  position: absolute;
-  right: 34px;
-  bottom: 12px;
-  height: 18px;
-  width: 18px;
+  visibility: hidden;
 }
 
 #startnow {
@@ -129,4 +114,20 @@ li .title {
 .fineprint {
   margin-top: 24px;
   font-size: 12px;
+}
+
+#loader {
+  position: absolute;
+  bottom: 11px;
+  width: 20px;
+  height: 20px;
+  background: #FFF;
+  right: 20px;
+}
+
+.optional {
+  font-size: 10px;
+  position: relative;
+  top: 16px;
+  right: 40px;
 }

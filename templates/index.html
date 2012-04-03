@@ -11,31 +11,18 @@
   <body>
     <div id="header">
       <span class="tasks-title">Tasks'</span> &nbsp;&nbsp; 
-      <input type="checkbox" name="complete" id="complete">
-      <label for="complete">Show complete</label> &nbsp;&nbsp; 
-      <input type="checkbox" name="incomplete" id="incomplete" checked>
-      <label for="incomplete">Show incomplete</label> &nbsp;&nbsp; 
-      <img id="loading" src="/img/load.gif">
+      <span id="tasks-todo"></span>
     </div>
+    <div id="loader">&nbsp;</div>
     <ul id="tasklist">
-      {% if authorize_url %}
-        <a class="title" title="Grant read access to your tasks" href="{{ authorize_url }}">Grant Access</a>
-      {% endif %}
-
       <li class="add">
-          new:
-          <form id="addform" method="GET" action="." style="display:inline;">
-            <input type="text" id="addtask" name="title">
-            <input type="text" id="adddate" class="auto-kal" name="date">
-            <input type="submit" value="save" id="addsubmit">
-          </form>
+        <form id="addform" method="GET" action="." style="display:inline;">
+          <input type="text" id="addtask" value="new task" name="title">
+          <input type="text" id="adddate" value="date" class="auto-kal" name="date">
+          <span class="optional">optional</span>
+          <input type="submit" value="add" id="addsubmit">
+        </form>
       </li>
-      {% for task in tasks %}
-      <li class="{% if task.complete %}complete{% else %}incomplete{% endif %}">
-        <span class="check" id="{{ task.id }}">&#x2713;</span>
-        <a class="title" title="{{ task.title }}">{{ task.title }}</a>
-      </li>
-      {% endfor %}
     </ul>
   </body>
 </html>
