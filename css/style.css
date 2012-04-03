@@ -131,3 +131,11 @@ li .title {
   top: 16px;
   right: 40px;
 }
+
+.loading {
+  color: #CCC;
+}
+
+#username {
+  color: #444;
+}

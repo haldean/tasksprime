@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Tasks Prime</title>
+    <title>tasks'</title>
     <link href="/css/style.css" rel="stylesheet" type="text/css">
     <link href="/css/kalendae.css" rel="stylesheet" type="text/css">
     <script src="/js/ender.js"></script>
@@ -12,6 +12,7 @@
     <div id="header">
       <span class="tasks-title">Tasks'</span> &nbsp;&nbsp; 
       <span id="tasks-todo"></span>
+      <span id="username">&nbsp;&nbsp;{{ user }}</span>
     </div>
     <div id="loader">&nbsp;</div>
     <ul id="tasklist">
@@ -23,6 +24,7 @@
           <input type="submit" value="add" id="addsubmit">
         </form>
       </li>
+      <li class="task loading"><span class="check">&nbsp;</span>Loading...</li>
     </ul>
   </body>
 </html>

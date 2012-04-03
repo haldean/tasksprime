@@ -3,6 +3,7 @@ from datetime import datetime
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.api.users import get_current_user
 from oauth2decorator import OAuth2Decorator
 import httplib2
 import settings
@@ -80,7 +81,7 @@ class TasksHandler(webapp.RequestHandler):
   @decorator.oauth_required
   def get(self):
     if self.request.get('title'):
-      if self.request.get('date'):
+      if self.request.get('date') and self.request.get('date') != 'date':
         date = datetime.strptime(self.request.get('date'), '%m/%d/%Y')
         task = {
             'title': self.request.get('title'),
@@ -94,8 +95,8 @@ class TasksHandler(webapp.RequestHandler):
       result = service.tasks().insert(tasklist='@default', body=task).execute()
       self.response.out.write('success')
     else:
-      with open('templates/index.html') as f:
-        self.response.out.write(f.read())
+      self.response.out.write(template.render('templates/index.html', {
+        'user': get_current_user().nickname() }))
 
 application = webapp.WSGIApplication(
     [('/', SplashHandler),
