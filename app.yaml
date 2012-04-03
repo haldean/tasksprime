@@ -1,6 +1,7 @@
 application: tasksprime
 version: 1
-runtime: python
+runtime: python27
+threadsafe: true
 api_version: 1
 
 handlers:
