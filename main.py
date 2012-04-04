@@ -67,16 +67,16 @@ class CompletedHandler(webapp.RequestHandler):
     self.response.out.write('success')
 
 class ApiHandler(webapp.RequestHandler):
-  @decorator.oauth_check
+  @decorator.oauth_required
   def get(self):
-    if not decorator.has_credentials():
-      return
-
     self.response.headers['Content-Type'] = 'application/json'
 
     import json
     def strip_dates(d):
-      del d['due']
+      if 'due' in d and d['due']:
+        d['due'] = d['due'].strftime('%Y/%m/%d')
+      else:
+        del d['due']
       return d
     tasks = map(strip_dates, get_tasks())
     self.response.out.write(json.dumps(tasks))

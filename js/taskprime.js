@@ -46,8 +46,19 @@
     } else {
       taskli += 'incomplete'
     }
-    taskli += ' task"><span class="check">&#x2713;</span>'
-    taskli += task.title + '</a></li>'
+    taskli += ' task"><span class="check">&#x2713;</span>' + task.title
+    if (task.due) {
+      var dp = task.due.split('/')
+      for (var i = 0; i < dp.length; i++) dp[i] = +dp[i]
+      console.log(dp)
+      var ms_from_now = (new Date(dp[0], dp[1] - 1, dp[2])).getTime() - Date.now()
+      console.log(ms_from_now)
+      var days_from_now = ms_from_now / (1000 * 60 * 60 * 24)
+
+      taskli += '<span class="due">' + task.due + ' ('
+      taskli += Math.ceil(days_from_now) + ' days)</span>'
+    }
+    taskli += '</li>'
     return taskli
   }
 

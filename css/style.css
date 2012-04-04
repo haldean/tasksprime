@@ -147,3 +147,9 @@ li .title {
   font-size: 18px;
   display: none;
 }
+
+.due {
+  margin-left: 16px;
+  color: #BBB;
+  font-size: 16px;
+}
