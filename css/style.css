@@ -130,6 +130,15 @@ li .title {
   color: #444;
 }
 
+#undo {
+  color: #CCC;
+  text-decoration: none;
+}
+
+#undo:hover {
+  color: #FFF;
+}
+
 #donate {
   color: #888;
   position: absolute;

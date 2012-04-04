@@ -3,6 +3,7 @@
   var task_field_init = false
   var date_field_init = false
   var blink_high = false
+  var last_checked = undefined
 
   var startLoad = function() {
     if (!loading) {
@@ -91,9 +92,15 @@
     })
   }
 
+  var setLastChecked = function(id) {
+    last_checked = id
+    $('#undo').show()
+  }
+
   var bindEvents = function() {
     $('.incomplete').click(function(ev) {
       var id = ev.currentTarget.id
+      setLastChecked(id)
 
       $('#' + id + ' .check').css('color', '#000')
       var hide = function() {
@@ -121,6 +128,7 @@
     startLoad()
     getTasks(endLoad)
 
+    $('#undo').hide()
     $('#adddate').calender()
 
     $('#complete').click(function(e) {
@@ -137,6 +145,22 @@
       } else {
         $('.incomplete').css('display', 'none')
       }
+    })
+
+    $('#undo').click(function(e) {
+      if (last_checked) {
+        startLoad()
+        $.ajax({
+          url: '/undo/',
+          type: 'html',
+          method: 'get',
+          data: { 'task': last_checked },
+          success: function(e) { getTasks(function() { endLoad() } ) }
+        })
+      }
+
+      last_checked = undefined
+      $('#undo').hide()
     })
 
     $('#addtask').focus(function(e) {

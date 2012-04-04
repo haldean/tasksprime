@@ -6,6 +6,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api.users import get_current_user
 from oauth2decorator import OAuth2Decorator
 import httplib2
+import logging
 import settings
 
 decorator = OAuth2Decorator(
@@ -58,11 +59,18 @@ class CompletedHandler(webapp.RequestHandler):
   @decorator.oauth_required
   def get(self):
     service = build('tasks', 'v1', http=decorator.http())
-
-    task = service.tasks().get(tasklist='@default',
-        task=self.request.get('task')).execute()
+    task = service.tasks().get(tasklist='@default', task=self.request.get('task')).execute()
     task['status'] = 'completed'
+    result = service.tasks().update(tasklist='@default', task=task['id'], body=task).execute()
+    self.response.out.write('success')
 
+class UncompletedHandler(webapp.RequestHandler):
+  @decorator.oauth_required
+  def get(self):
+    service = build('tasks', 'v1', http=decorator.http())
+    task = service.tasks().get(tasklist='@default', task=self.request.get('task')).execute()
+    task['status'] = 'needsAction'
+    del task['completed']
     result = service.tasks().update(tasklist='@default', task=task['id'], body=task).execute()
     self.response.out.write('success')
 
@@ -106,6 +114,7 @@ application = webapp.WSGIApplication(
     [('/', SplashHandler),
       ('/tasks/json', ApiHandler),
       ('/tasks/', TasksHandler),
+      ('/undo/', UncompletedHandler),
       ('/complete/', CompletedHandler)],
     debug=True)
 
