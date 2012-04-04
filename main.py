@@ -86,7 +86,7 @@ class TasksHandler(webapp.RequestHandler):
   def get(self):
     if self.request.get('title'):
       if self.request.get('date') and self.request.get('date') != 'date':
-        date = datetime.strptime(self.request.get('date'), '%m/%d/%Y')
+        date = datetime.strptime(self.request.get('date'), '%m-%d-%Y')
         task = {
             'title': self.request.get('title'),
             'notes': '',
