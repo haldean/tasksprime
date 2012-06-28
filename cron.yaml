@@ -1,0 +1,4 @@
+cron:
+- description: keepalive requests
+  url: /
+  schedule: every 30 mins

@@ -88,7 +88,8 @@
         }
 
         if (callback) callback()
-      }
+      },
+      err: function(err) { window.location.reload(); }
     })
   }
 
