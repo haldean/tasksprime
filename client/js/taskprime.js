@@ -45,7 +45,7 @@ var apiLoad = function() {
 
   window.setTimeout(function() {
     var config = {
-      'client_id': '683217246670',
+      'client_id': '683217246670-u3e76r7hq0ek5vus9kr7cj4tassh5l7u.apps.googleusercontent.com',
       'scope': 'https://www.googleapis.com/auth/tasks',
     };
 
