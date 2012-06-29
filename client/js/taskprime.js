@@ -1,8 +1,9 @@
-var loading = false
-var task_field_init = false
-var date_field_init = false
-var blink_high = false
-var last_checked = undefined
+var loading = false;
+var task_field_init = false;
+var date_field_init = false;
+var blink_high = false;
+var last_checked = undefined;
+var task_list = '@default';
 
 var startLoad = function() {
   if (!loading) {
@@ -39,28 +40,52 @@ var endLoad = function() {
   loading = false
 }
 
+var authorize = function(immediate, reload) {
+  var config = {
+    'client_id': '683217246670-u3e76r7hq0ek5vus9kr7cj4tassh5l7u.apps.googleusercontent.com',
+    'scope': 'https://www.googleapis.com/auth/tasks',
+    'immediate': immediate,
+  };
+
+  gapi.auth.authorize(config, function(result) {
+    if (reload) window.location.reload();
+
+    if (!result && immediate) {
+      window.setTimeout(function() { authorize(false, true); }, 5);
+    } else if (!result) {
+      alert('Unable to authorize with the Google Tasks API. Did you grant the correct permissions?');
+    } else {
+      gapi.client.load('tasks', 'v1', function() { getLists(); getTasks(endLoad); });
+    }
+  });
+}
+
 var apiLoad = function() {
   startLoad();
   gapi.client.setApiKey('AIzaSyAhnwP7S4TIZ8JSNSzq3It78SMqq9FJqCM');
 
   window.setTimeout(function() {
-    var config = {
-      'client_id': '683217246670-u3e76r7hq0ek5vus9kr7cj4tassh5l7u.apps.googleusercontent.com',
-      'scope': 'https://www.googleapis.com/auth/tasks',
-    };
-
-    gapi.auth.authorize(config, function(result) {
-      console.log(result);
-      console.log('authorized');
-      console.log(gapi.auth.getToken());
-
-      gapi.client.load('tasks', 'v1', afterLoaded);
-    });
+    authorize(true, false);
   }, 1);
 }
 
-var afterLoaded = function() {
-  getTasks(endLoad);
+var getLists = function() {
+  gapi.client.tasks.tasklists.list().execute(function(resp) {
+    $('#tasks-lists option').remove();
+
+    var lists = resp.result.items;
+    gapi.client.tasks.tasklists.get({'tasklist': '@default'}).execute(function(inner_resp) {
+      var default_id = inner_resp.result.id;
+      var dropdown = $('#tasks-lists')
+      for (var i = 0; i < lists.length; i++) {
+        var list = lists[i];
+        dropdown.append(
+          '<option value="' + list.id + '">' + list.title + '</option>');
+      }
+      dropdown.val(default_id);
+      dropdown.css('display', 'inline');
+    });
+  });
 }
 
 var makeTaskLi = function(task) {
@@ -85,25 +110,27 @@ var makeTaskLi = function(task) {
 
 var getTasks = function(callback) {
   var request = gapi.client.tasks.tasks.list({
-    'tasklist': '@default',
+    'tasklist': task_list,
     'showCompleted': false,
   });
   request.execute(function(resp) {
+    tasks = resp.items;
+
     $('#tasklist .task').remove();
     $('#tutorial').css('display', 'none');
 
-    var task_count = resp.length;
+    var task_count = tasks.length;
     var incomplete_count = 0;
     for (var i = 0; i < task_count; i++) {
-      if (!resp[i].complete) {
+      if (!tasks[i].complete) {
         incomplete_count++;
       }
-      $('#tasklist').append(makeTaskLi(resp[i]));
+      $('#tasklist').append(makeTaskLi(tasks[i]));
     }
 
     if (task_count > 0) {
-      $('#tasks-todo').html(incomplete_count + ' things to do, ' +
-        (task_count - incomplete_count) + ' things done.');
+      $('#tasks-todo').html(incomplete_count + ' things to do');
+        // + ', ' + (task_count - incomplete_count) + ' things done.');
       bindEvents();
     } else {
       $('#tasks-todo').html('no tasks yet. add one above to get started!');
@@ -130,20 +157,21 @@ var bindEvents = function() {
     }
     setTimeout(hide, 800)
 
-    /* TO DO */
-    $.ajax({
-      url: '/complete/',
-      type: 'html',
-      method: 'get',
-      data: { 'task': id },
-      success: function(resp) {
-        if (resp != 'success') {
-          alert('Could not mark as done.')
-          console.log(resp)
-        }
-      }
-    })
-    getTasks()
+    gapi.client.tasks.tasks.get({
+      'tasklist': task_list,
+      'task': id,
+    }).execute(function(resp) {
+      task = resp.result;
+      task.status = 'completed';
+
+      gapi.client.tasks.tasks.update({
+        'tasklist': task_list,
+        'task': id,
+        'resource': task,
+      }).execute(function(inner_resp) {
+
+      });
+    });
   })
 }
 
@@ -169,14 +197,25 @@ $.domReady(function () {
 
   $('#undo').click(function(e) {
     if (last_checked) {
-      startLoad()
-      $.ajax({
-        url: '/undo/',
-        type: 'html',
-        method: 'get',
-        data: { 'task': last_checked },
-        success: function(e) { getTasks(function() { endLoad() } ) }
-      })
+      startLoad();
+      last_checked_id = last_checked;
+
+      gapi.client.tasks.tasks.get({
+        'tasklist': task_list,
+        'task': last_checked_id,
+      }).execute(function(resp) {
+        undo_task = resp.result;
+        delete undo_task.completed;
+        undo_task.status = 'needsAction';
+
+        gapi.client.tasks.tasks.update({
+          'tasklist': task_list,
+          'task': last_checked_id,
+          'resource': undo_task,
+        }).execute(function(inner_resp) {
+          getTasks(endLoad);
+        });
+      });
     }
 
     last_checked = undefined
@@ -198,36 +237,35 @@ $.domReady(function () {
   })
 
   $('#addform').submit(function(e) {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
 
-    var title = $('#addtask').val()
+    var title = $('#addtask').val();
     if (!title) {
-      $('#addtask').focus()
-    return
+      $('#addtask').focus();
+      return;
     }
 
     startLoad();
-    var check_span = '<span class="check">&nbsp;</span>'
-    var item = '<a class="title">' + title + '</a>'
-    $.ajax({
-      url: '/tasks/',
-      type: 'html',
-      method: 'get',
-      data: { 'title': title, 'date': $('#adddate').val() },
-      success: function(resp) {
-        if (resp == 'success') {
-          getTasks(function() {
-            $('#addtask').val('')
-            $('#adddate').val('')
-            endLoad()
-          })
-        } else {
-          endLoad()
-      alert('Failed to save task.')
-      console.log(resp)
-        }
-      }
-    })
-  })
+    var check_span = '<span class="check">&nbsp;</span>';
+    var item = '<a class="title">' + title + '</a>';
+
+    gapi.client.tasks.tasks.insert({
+      'tasklist': task_list,
+      'resource': {
+        'title': title,
+      },
+    }).execute(function(result) {
+      getTasks(function() {
+        $('#addtask').val('');
+        $('#adddate').val('');
+        endLoad();
+      });
+    });
+  });
+
+  $('#tasks-lists').change(function(e) {
+    task_list = $('#tasks-lists').val();
+    getTasks();
+  });
 })
