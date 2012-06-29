@@ -1,20 +1,16 @@
 application: tasksprime
-version: 1
+version: 2
 runtime: python27
-threadsafe: false
+threadsafe: true
 api_version: 1
 
 handlers:
-- url: /oauth2callback
-  script: oauth2client/appengine.py
-- url: /css
-  static_dir: css
-- url: /js
-  static_dir: js
-- url: /img
-  static_dir: img
 - url: .*
-  script: main.py
+  static_dir: client/
+- url: /js
+  static_dir: client/js
+- url: /css
+  static_dir: client/css
 
 skip_files:
 - ^(.*/)?app\.yaml
@@ -27,3 +23,4 @@ skip_files:
 - ^(.*/)?.*/RCS/.*
 - ^(.*/)?\..*
 - ^js/node_modules
+- ^client/js/node_modules
