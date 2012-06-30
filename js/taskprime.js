@@ -54,7 +54,7 @@ var authorize = function(immediate, reload) {
       if (window.location.hash == '#force-auth') {
         window.setTimeout(function() { authorize(false, true); }, 5);
       } else {
-        window.location = '/convert.html';
+        window.location = '/welcome.html';
       }
     } else if (!result) {
       alert('Unable to authorize with the Google Tasks API. Did you grant the correct permissions?');
