@@ -7,37 +7,37 @@ var task_list = '@default';
 
 var startLoad = function() {
   if (!loading) {
-    loading = true
-    loadTick()
+    loading = true;
+    loadTick();
   }
 }
 
 var loadTick = function() {
-  var loader = $('.tasks-title')
+  var loader = $('.tasks-title');
 
   var blink_on = function() {
-    loader.css('color', '#FFF')
+    loader.css('color', '#FFF');
   }
 
   var blink_off = function() {
-    loader.css('color', '#666')
+    loader.css('color', '#666');
   }
 
   if (!loading) {
     blink_on()
-    return
+    return;
   } else if (blink_high) {
-    blink_off()
+    blink_off();
   } else {
-    blink_on()
+    blink_on();
   }
 
-  blink_high = !blink_high
-  setTimeout(loadTick, 300)
+  blink_high = !blink_high;
+  setTimeout(loadTick, 300);
 }
 
 var endLoad = function() {
-  loading = false
+  loading = false;
 }
 
 var authorize = function(immediate, reload) {
@@ -51,7 +51,11 @@ var authorize = function(immediate, reload) {
     if (reload) window.location.reload();
 
     if (!result && immediate) {
-      window.setTimeout(function() { authorize(false, true); }, 5);
+      if (window.location.hash == '#force-auth') {
+        window.setTimeout(function() { authorize(false, true); }, 5);
+      } else {
+        window.location = '/convert.html';
+      }
     } else if (!result) {
       alert('Unable to authorize with the Google Tasks API. Did you grant the correct permissions?');
     } else {
@@ -89,22 +93,22 @@ var getLists = function() {
 }
 
 var makeTaskLi = function(task) {
-  var taskli = '<li id="' + task.id + '" class="'
+  var taskli = '<li id="' + task.id + '" class="';
   if (task.complete) {
-    taskli += 'complete'
+    taskli += 'complete';
   } else {
-    taskli += 'incomplete'
+    taskli += 'incomplete';
   }
-  taskli += ' task"><span class="check">&#x2713;</span>' + task.title
+  taskli += ' task"><span class="check">&#x2713;</span>' + task.title;
   if (task.due) {
-    var dp = task.due.split('/')
-    var ms_from_now = (new Date(+dp[0], +dp[1] - 1, +dp[2])).getTime() - Date.now()
-    var days_from_now = ms_from_now / (1000 * 60 * 60 * 24)
+    var dp = task.due.split('/');
+    var ms_from_now = (new Date(+dp[0], +dp[1] - 1, +dp[2])).getTime() - Date.now();
+    var days_from_now = ms_from_now / (1000 * 60 * 60 * 24);
 
-    taskli += '<span class="due">' + task.due + ' ('
-    taskli += Math.ceil(days_from_now) + ' days)</span>'
+    taskli += '<span class="due">' + task.due + ' (';
+    taskli += Math.ceil(days_from_now) + ' days)</span>';
   }
-  taskli += '</li>'
+  taskli += '</li>';
   return taskli
 }
 
@@ -142,20 +146,20 @@ var getTasks = function(callback) {
 }
 
 var setLastChecked = function(id) {
-  last_checked = id
-  $('#undo').show()
+  last_checked = id;
+  $('#undo').show();
 }
 
 var bindEvents = function() {
   $('.incomplete').click(function(ev) {
-    var id = ev.currentTarget.id
-    setLastChecked(id)
+    var id = ev.currentTarget.id;
+    setLastChecked(id);
 
-    $('#' + id + ' .check').css('color', '#000')
+    $('#' + id + ' .check').css('color', '#000');
     var hide = function() {
-      $('#' + id).removeClass('incomplete').addClass('complete')
+      $('#' + id).removeClass('incomplete').addClass('complete');
     }
-    setTimeout(hide, 800)
+    setTimeout(hide, 800);
 
     gapi.client.tasks.tasks.get({
       'tasklist': task_list,
@@ -176,22 +180,22 @@ var bindEvents = function() {
 }
 
 $.domReady(function () {
-  $('#undo').hide()
-  $('#adddate').calender()
+  $('#undo').hide();
+  $('#adddate').calender();
 
   $('#complete').click(function(e) {
     if ($('#complete').attr('checked')) {
-      $('.complete').css('display', 'list-item')
+      $('.complete').css('display', 'list-item');
     } else {
-      $('.complete').css('display', 'none')
+      $('.complete').css('display', 'none');
     }
   });
 
   $('#incomplete').click(function(e) {
     if ($('#incomplete').attr('checked')) {
-      $('.incomplete').css('display', 'list-item')
+      $('.incomplete').css('display', 'list-item');
     } else {
-      $('.incomplete').css('display', 'none')
+      $('.incomplete').css('display', 'none');
     }
   });
 
@@ -224,15 +228,15 @@ $.domReady(function () {
 
   $('#addtask').focus(function(e) {
     if (!task_field_init) {
-      $('#addtask').val('').css('color', '#000')
-    task_field_init = true
+      $('#addtask').val('').css('color', '#000');
+      task_field_init = true;
     }
   })
 
   $('#adddate').focus(function(e) {
     if (!date_field_init) {
-      $('#adddate').val('').css('color', '#000')
-    date_field_init = true
+      $('#adddate').val('').css('color', '#000');
+      date_field_init = true;
     }
   })
 
