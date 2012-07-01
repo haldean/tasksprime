@@ -101,11 +101,13 @@ var makeTaskLi = function(task) {
   }
   taskli += ' task"><span class="check">&#x2713;</span>' + task.title;
   if (task.due) {
-    var dp = task.due.split('/');
-    var ms_from_now = (new Date(+dp[0], +dp[1] - 1, +dp[2])).getTime() - Date.now();
+    // The Javascript Date object is unforgivably annoying.
+    var dp = task.due.split('T')[0].split('-');
+    var then_date = new Date(+dp[0], +dp[1] - 1, +dp[2]);
+    var ms_from_now = then_date.getTime() - Date.now();
     var days_from_now = ms_from_now / (1000 * 60 * 60 * 24);
 
-    taskli += '<span class="due">' + task.due + ' (';
+    taskli += '<span class="due">' + dp.join('-') + ' (';
     taskli += Math.ceil(days_from_now) + ' days)</span>';
   }
   taskli += '</li>';
@@ -244,10 +246,20 @@ $.domReady(function () {
     e.preventDefault();
     e.stopPropagation();
 
+    var new_task = {}
     var title = $('#addtask').val();
     if (!title) {
       $('#addtask').focus();
       return;
+    } else {
+      new_task.title = title;
+    }
+
+    var date = $('#adddate').val();
+    if (date != 'date') {
+      var date_parts = date.split('-');
+      new_task.due = (
+        date_parts[2] + '-' + date_parts[0] + '-' + date_parts[1] + 'T00:00:00.000Z');
     }
 
     startLoad();
@@ -256,9 +268,7 @@ $.domReady(function () {
 
     gapi.client.tasks.tasks.insert({
       'tasklist': task_list,
-      'resource': {
-        'title': title,
-      },
+      'resource': new_task,
     }).execute(function(result) {
       getTasks(function() {
         $('#addtask').val('');
