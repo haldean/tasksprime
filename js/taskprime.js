@@ -5,6 +5,10 @@ var blink_high = false;
 var last_checked = undefined;
 var task_list = '@default';
 
+var trackEvent = function(category, action) {
+  _gaq.push(['_trackEvent', category, action]);
+}
+
 var startLoad = function() {
   if (!loading) {
     loading = true;
@@ -79,6 +83,8 @@ var getLists = function() {
 
     var lists = resp.result.items;
     gapi.client.tasks.tasklists.get({'tasklist': '@default'}).execute(function(inner_resp) {
+      trackEvent('Tasklist', 'Load');
+
       var default_id = inner_resp.result.id;
       var dropdown = $('#tasks-lists')
       for (var i = 0; i < lists.length; i++) {
@@ -120,6 +126,8 @@ var getTasks = function(callback) {
     'showCompleted': false,
   });
   request.execute(function(resp) {
+    trackEvent('Tasks', 'Load');
+
     tasks = resp.items;
 
     $('#tasklist .task').remove();
@@ -175,7 +183,7 @@ var bindEvents = function() {
         'task': id,
         'resource': task,
       }).execute(function(inner_resp) {
-
+        trackEvent('Task', 'Complete');
       });
     });
   })
@@ -219,6 +227,7 @@ $.domReady(function () {
           'task': last_checked_id,
           'resource': undo_task,
         }).execute(function(inner_resp) {
+          trackEvent('Task', 'Undo');
           getTasks(endLoad);
         });
       });
@@ -270,6 +279,7 @@ $.domReady(function () {
       'tasklist': task_list,
       'resource': new_task,
     }).execute(function(result) {
+      trackEvent('Task', 'Add');
       getTasks(function() {
         $('#addtask').val('');
         $('#adddate').val('');
@@ -279,6 +289,7 @@ $.domReady(function () {
   });
 
   $('#tasks-lists').change(function(e) {
+    trackEvent('Tasklist', 'Change');
     task_list = $('#tasks-lists').val();
     getTasks();
   });
