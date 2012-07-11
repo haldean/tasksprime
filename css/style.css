@@ -139,14 +139,19 @@ li .title {
   color: #FFF;
 }
 
-#donate {
-  color: #888;
+.donate {
+  display: inline;
   position: absolute;
   right: 40px;
+  bottom: 13px;
+}
+
+.donate a {
+  color: #888;
   text-decoration: none;
 }
 
-#donate:hover {
+.donate a:hover {
   pointer: default;
   color: #AAA;
 }
