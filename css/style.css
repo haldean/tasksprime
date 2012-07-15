@@ -130,12 +130,12 @@ li .title {
   color: #444;
 }
 
-#undo {
+#undo, #addlist {
   color: #CCC;
   text-decoration: none;
 }
 
-#undo:hover {
+#undo:hover, #addlist:hover {
   color: #FFF;
 }
 

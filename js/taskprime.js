@@ -77,7 +77,7 @@ var apiLoad = function() {
   }, 1);
 }
 
-var getLists = function() {
+var getLists = function(callback) {
   gapi.client.tasks.tasklists.list().execute(function(resp) {
     $('#tasks-lists option').remove();
 
@@ -94,7 +94,10 @@ var getLists = function() {
       }
       dropdown.val(default_id);
       dropdown.css('display', 'inline');
+      $('#addlist').css('display', 'inline');
     });
+
+    if (callback) callback();
   });
 }
 
@@ -132,7 +135,7 @@ var getTasks = function(callback) {
     $('#tasklist .task').remove();
     $('#tutorial').css('display', 'none');
 
-    var task_count = tasks.length;
+    var task_count = tasks ? tasks.length : 0;
     var incomplete_count = 0;
     for (var i = 0; i < task_count; i++) {
       if (!tasks[i].complete) {
@@ -142,8 +145,11 @@ var getTasks = function(callback) {
     }
 
     if (task_count > 0) {
-      $('#tasks-todo').html(incomplete_count + ' things to do');
-        // + ', ' + (task_count - incomplete_count) + ' things done.');
+      if (task_count > 1) {
+        $('#tasks-todo').html(incomplete_count + ' things to do');
+      } else {
+        $('#tasks-todo').html('1 thing to do');
+      }
       bindEvents();
     } else {
       $('#tasks-todo').html('no tasks yet. add one above to get started!');
@@ -185,11 +191,12 @@ var bindEvents = function() {
         trackEvent('Task', 'Complete');
       });
     });
-  })
+  });
 }
 
 $.domReady(function () {
   $('#undo').hide();
+  $('#addlist').hide();
   $('#adddate').calender();
 
   $('#complete').click(function(e) {
@@ -288,5 +295,19 @@ $.domReady(function () {
     trackEvent('Tasklist', 'Change');
     task_list = $('#tasks-lists').val();
     getTasks();
+  });
+
+  $('#addlist').click(function(e) {
+    var name = prompt('Name for new task list:');
+    if (name) {
+      startLoad();
+      var tasklist = {
+        'resource': { 'title': name },
+      }
+      gapi.client.tasks.tasklists.insert(tasklist).execute(function (res) {
+        trackEvent('Tasklist', 'Add');
+        getLists(endLoad);
+      });
+    }
   });
 })
